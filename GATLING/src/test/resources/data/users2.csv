@@ -1,0 +1,6 @@
+name,address,postal,city,phone,email,country
+Andrii Test,Main street 1,26100,Kyiv,0971111111,andrii1@test.com,UA
+Ivan Load,Second street 5,26101,Lviv,0972222222,ivan2@test.com,UA
+Olha Perf,Perf street 9,26102,Odesa,0973333333,olha3@test.com,UA
+Test User,Load test ave 12,26103,Dnipro,0974444444,test4@test.com,UA
+Perf Runner,Stress street 7,26104,Kharkiv,0975555555,perf5@test.com,UA
