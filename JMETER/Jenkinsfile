@@ -4,10 +4,12 @@ pipeline {
     stages {
         stage('Run JMeter Test') {
             steps {
-                
                 dir('JMETER') {
-                    bat 'if exist results rmdir /s /q results && mkdir results'
+                    // Видаляємо стару папку результатів і СТВОРЮЄМО структуру наперед
+                    bat 'if exist results rmdir /s /q results'
+                    bat 'mkdir results\\report' 
                     
+                    // Запуск тесту
                     bat 'call C:\\JMETER\\apache-jmeter-5.6.3\\bin\\jmeter.bat -n -t Task_recorder_1.jmx -l results\\result.jtl -e -o results\\report'
                 }
             }
