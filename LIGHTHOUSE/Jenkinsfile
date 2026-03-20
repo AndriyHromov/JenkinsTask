@@ -1,0 +1,41 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Install Lighthouse') {
+            steps {
+                dir('LIGHTHOUSE') {
+                    
+                    bat 'npm install lighthouse'
+                }
+            }
+        }
+        stage('Run Lighthouse Test') {
+            steps {
+                dir('LIGHTHOUSE') {
+                    
+                    bat 'if not exist reports mkdir reports'
+                    
+                    
+                    bat 'npx lighthouse https://www.wikipedia.org --quiet --chrome-flags="--headless" --output html --output-path ./reports/lighthouse-report.html'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+           
+            archiveArtifacts artifacts: 'LIGHTHOUSE/reports/lighthouse-report.html', fingerprint: true
+            
+            
+            publishHTML(target: [
+                reportDir: 'LIGHTHOUSE/reports',
+                reportFiles: 'lighthouse-report.html',
+                reportName: 'Lighthouse Report',
+                keepAll: true,
+                alwaysLinkToLastBuild: true
+            ])
+        }
+    }
+}
