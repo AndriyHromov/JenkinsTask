@@ -1,0 +1,34 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Run Gatling Test') {
+            steps {
+                dir('GATLING') {
+                    // Запускаємо Gatling через Maven
+                    // Переконайся, що mvn додано в Path Windows
+                    bat 'mvn gatling:test'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Архівуємо результати Gatling (вони зазвичай у target/gatling)
+            archiveArtifacts artifacts: 'GATLING/target/gatling/**/*', 
+                             fingerprint: true, 
+                             allowEmptyArchive: true
+
+            // Публікуємо звіт (якщо встановлено Gatling Check Plugin або просто як HTML)
+            publishHTML(target: [
+                reportDir: 'GATLING/target/gatling',
+                reportFiles: '**/index.html',
+                reportName: 'Gatling Report',
+                keepAll: true,
+                alwaysLinkToLastBuild: true,
+                allowMissing: true
+            ])
+        }
+    }
+}
