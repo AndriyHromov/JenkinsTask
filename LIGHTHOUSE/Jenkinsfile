@@ -2,22 +2,18 @@ pipeline {
     agent any
 
     stages {
-        stage('Install Lighthouse') {
-            steps {
-                dir('LIGHTHOUSE') {
-                    
-                    bat 'npm install lighthouse'
-                }
-            }
-        }
         stage('Run Lighthouse Test') {
             steps {
+            
                 dir('LIGHTHOUSE') {
-                    
-                    bat 'if not exist reports mkdir reports'
-                    
-                    
-                    bat 'npx lighthouse https://www.wikipedia.org --quiet --chrome-flags="--headless" --output html --output-path ./reports/lighthouse-report.html'
+                    bat '''
+                    docker run --rm ^
+                    -v %cd%:/app ^
+                    -w /app ^
+                    --add-host=wp:host-gateway ^
+                    ghcr.io/puppeteer/puppeteer:latest ^
+                    sh -c "npm install && node index2.js"
+                    '''
                 }
             }
         }
@@ -25,16 +21,18 @@ pipeline {
 
     post {
         always {
-           
-            archiveArtifacts artifacts: 'LIGHTHOUSE/reports/lighthouse-report.html', fingerprint: true
             
-            
+            archiveArtifacts artifacts: 'LIGHTHOUSE/lighthouse-report-1.html', 
+                             fingerprint: true, 
+                             allowEmptyArchive: true
+
             publishHTML(target: [
-                reportDir: 'LIGHTHOUSE/reports',
-                reportFiles: 'lighthouse-report.html',
+                reportDir: 'LIGHTHOUSE', 
+                reportFiles: 'lighthouse-report-1.html',
                 reportName: 'Lighthouse Report',
                 keepAll: true,
-                alwaysLinkToLastBuild: true
+                alwaysLinkToLastBuild: true,
+                allowMissing: true
             ])
         }
     }
